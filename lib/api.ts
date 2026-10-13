@@ -17,7 +17,13 @@ import type {
 } from "@/types";
 import { clearAuth, getToken } from "@/lib/auth";
 
-const API_URL = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000").replace(/\/$/, "");
+function cleanApiUrl(raw: string | undefined): string {
+  if (!raw) return "http://localhost:5000";
+  const match = raw.match(/https?:\/\/[a-zA-Z0-9\.\-]+(:[0-9]+)?/);
+  return match ? match[0].replace(/\/$/, "") : raw.trim().replace(/\/$/, "");
+}
+
+const API_URL = cleanApiUrl(process.env.NEXT_PUBLIC_API_URL);
 
 export class ApiError extends Error {
   constructor(message: string, public status: number, public errors?: Record<string, string[]>) {
